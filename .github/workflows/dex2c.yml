@@ -41,7 +41,13 @@ jobs:
 
       - name: Run Dex2C on APK
         run: |
-          # دلته مو یوازې هغه اضافي -a لرې کړ، پام مو وي چې mohasaba.apk ستاسو د فایل اصلي نوم وي
+          # دلته مو د پروګرام د تنظیماتو فایل اصلي ځای ته کاپي کړ
+          cp dcc/dcc.cfg .
+          
+          # د انډرایډ NDK لاره ورته ښیو ترڅو په C ژبه بدل شوي کوډونه کمپایل کړي
+          export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
+          
+          # اصلي عملیه
           python dcc/dcc.py mohasaba.apk -o protected_app.apk
 
       - name: Upload Protected APK

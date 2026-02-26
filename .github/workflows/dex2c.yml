@@ -41,13 +41,17 @@ jobs:
 
       - name: Run Dex2C on APK
         run: |
+          # د انډرایډ NDK لاره
           export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
-          cp mohasaba.apk dcc/
+          
+          # ستاسو نوی جاوا اپلیکیشن پروګرام ته کاپي کوو
+          cp KeyStore.apk dcc/
           cd dcc
           
-          # فلټر مو بیخي ساده کړ ترڅو که په هر فارمټ وي، ویې نیسي
-          python dcc.py mohasaba.apk -o protected_app.apk --filter ".*elyasomar.*"
+          # دلته مو فلټر ستاسو د نوي پېکج نوم او فایل سره برابر کړ
+          python dcc.py KeyStore.apk -o protected_app.apk --filter "Lcom/my/newproject51/.*"
           
+          # نوی قلف شوی اپلیکیشن بېرته راوړو
           cp protected_app.apk ../
 
       - name: Upload Protected APK

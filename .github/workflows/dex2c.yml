@@ -1,4 +1,4 @@
-name: Dex2C APK Builder
+name: Ultimate Dex2C Builder
 
 on:
   push:
@@ -32,26 +32,41 @@ jobs:
       - name: Install Apktool and Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y apktool
+          sudo apt-get install -y apktool zip unzip
 
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install asn1crypto lxml colorama networkx pydot pycryptodome
 
+      - name: Downgrade DEX Format (Fix for modern APKs)
+        run: |
+          # ۱. د اپلیکیشن خلاصول
+          mkdir extracted
+          unzip -q KeyStore.apk -d extracted
+          
+          # ۲. د انډرایډ SDK په مرسته د DEX فایل زوړ فارمټ (API 24) ته اړول
+          mkdir downgraded_dex
+          D8_PATH=$(find $ANDROID_HOME/build-tools -name d8 | sort -V | tail -n 1)
+          $D8_PATH extracted/classes.dex --min-api 24 --output downgraded_dex/
+          
+          # ۳. نوی (زوړ شوی) فایل بېرته خپل ځای ته کاپي کول
+          cp downgraded_dex/classes.dex extracted/
+          
+          # ۴. بېرته په نوي APK کې بسته کول
+          cd extracted
+          zip -q -r ../downgraded_app.apk *
+          cd ..
+
       - name: Run Dex2C on APK
         run: |
-          # د انډرایډ NDK لاره
           export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
-          
-          # ستاسو نوی جاوا اپلیکیشن پروګرام ته کاپي کوو
-          cp KeyStore.apk dcc/
+          cp downgraded_app.apk dcc/
           cd dcc
           
-          # دلته مو فلټر ستاسو د نوي پېکج نوم او فایل سره برابر کړ
-          python dcc.py KeyStore.apk -o protected_app.apk --filter "Lcom/my/newproject51/.*"
+          # اصلي عملیه
+          python dcc.py downgraded_app.apk -o protected_app.apk --filter ".*newproject51.*"
           
-          # نوی قلف شوی اپلیکیشن بېرته راوړو
           cp protected_app.apk ../
 
       - name: Upload Protected APK

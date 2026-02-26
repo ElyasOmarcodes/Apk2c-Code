@@ -21,8 +21,8 @@ jobs:
 
       - name: Run Strong Obfuscation
         run: |
-          # دلته مو یوازې د فایل له نوم مخکې /workdir/ ور اضافه کړ ترڅو یې په سم ځای کې پیدا کړي
-          docker run --rm -v "${PWD}:/workdir" claudiugeorgiu/obfuscapk -o ConstStringEncryption -o ClassRename -o MethodRename -o FieldRename -o CallIndirection -o Reorder -o Goto /workdir/KeyStore.apk
+          # دلته مو د -d کمانډ ور اضافه کړ ترڅو فایل خامخا زموږ فولډر ته راوباسي
+          docker run --rm -v "${PWD}:/workdir" claudiugeorgiu/obfuscapk -o ConstStringEncryption -o ClassRename -o MethodRename -o FieldRename -o CallIndirection -o Reorder -o Goto -d /workdir/KeyStore_obfuscated.apk /workdir/KeyStore.apk
 
       - name: Upload Protected APK
         uses: actions/upload-artifact@v4

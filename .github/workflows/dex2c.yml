@@ -44,7 +44,7 @@ jobs:
           # 1. د انډرایډ NDK لاره ورته ښیو
           export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
           
-          # 2. اپلیکیشن د پروګرام فولډر ته کاپي کوو او ور ننوځو
+          # 2. اپلیکیشن د پرو.ګرام فولډر ته کاپي کوو او ور ننوځو
           cp mohasaba.apk dcc/
           cd dcc
           

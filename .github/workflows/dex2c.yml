@@ -39,33 +39,54 @@ jobs:
           python -m pip install --upgrade pip
           pip install asn1crypto lxml colorama networkx pydot pycryptodome
 
-      - name: Downgrade DEX Format (Fix for modern APKs)
+      - name: Fix Multidex Issue (Smart DEX Swapper)
         run: |
-          # ۱. د اپلیکیشن خلاصول
-          mkdir extracted
-          unzip -q KeyStore.apk -d extracted
-          
-          # ۲. د انډرایډ SDK په مرسته د DEX فایل زوړ فارمټ (API 24) ته اړول
-          mkdir downgraded_dex
-          D8_PATH=$(find $ANDROID_HOME/build-tools -name d8 | sort -V | tail -n 1)
-          $D8_PATH extracted/classes.dex --min-api 24 --output downgraded_dex/
-          
-          # ۳. نوی (زوړ شوی) فایل بېرته خپل ځای ته کاپي کول
-          cp downgraded_dex/classes.dex extracted/
-          
-          # ۴. بېرته په نوي APK کې بسته کول
-          cd extracted
-          zip -q -r ../downgraded_app.apk *
-          cd ..
+          cat << 'EOF' > fix_dex.py
+          import zipfile
+          import os
+          import shutil
+
+          apk_name = "KeyStore.apk"
+          target_class = b"Lcom/my/newproject51"
+
+          # اپلیکیشن خلاصول
+          with zipfile.ZipFile(apk_name, 'r') as z:
+              z.extractall("extracted")
+
+          # د ټولو dex فایلونو پلټل
+          dex_files = [f for f in os.listdir("extracted") if f.endswith(".dex")]
+          target_dex = None
+
+          for dex in dex_files:
+              with open(os.path.join("extracted", dex), "rb") as f:
+                  if target_class in f.read():
+                      target_dex = dex
+                      break
+
+          if target_dex:
+              print(f"SUCCESS: Found your code in {target_dex}!")
+              if target_dex != "classes.dex":
+                  print("Swapping with classes.dex so DCC can read it...")
+                  os.rename(os.path.join("extracted", "classes.dex"), os.path.join("extracted", "temp.dex"))
+                  os.rename(os.path.join("extracted", target_dex), os.path.join("extracted", "classes.dex"))
+                  os.rename(os.path.join("extracted", "temp.dex"), os.path.join("extracted", target_dex))
+          else:
+              print("WARNING: Could not find your code in any DEX file.")
+
+          # بېرته بسته کول
+          shutil.make_archive("KeyStore_fixed", 'zip', "extracted")
+          os.rename("KeyStore_fixed.zip", "KeyStore_fixed.apk")
+          EOF
+          python fix_dex.py
 
       - name: Run Dex2C on APK
         run: |
           export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
-          cp downgraded_app.apk dcc/
+          cp KeyStore_fixed.apk dcc/
           cd dcc
           
           # اصلي عملیه
-          python dcc.py downgraded_app.apk -o protected_app.apk --filter ".*newproject51.*"
+          python dcc.py KeyStore_fixed.apk -o protected_app.apk --filter ".*newproject51.*"
           
           cp protected_app.apk ../
 

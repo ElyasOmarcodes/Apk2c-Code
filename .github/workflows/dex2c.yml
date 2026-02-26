@@ -34,15 +34,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y apktool
 
-      - name: Install Python Dependencies # ما دلته نوي اړین ماډیولونه ور زیات کړل
+      - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install asn1crypto lxml colorama networkx pydot pycryptodome
 
       - name: Run Dex2C on APK
         run: |
-          # دلته د خپل اپلیکیشن نوم (لکه mohasaba.apk) سم ولیکئ
-          python dcc/dcc.py -a mohasaba.apk -o protected_app.apk
+          # دلته مو یوازې هغه اضافي -a لرې کړ، پام مو وي چې mohasaba.apk ستاسو د فایل اصلي نوم وي
+          python dcc/dcc.py mohasaba.apk -o protected_app.apk
 
       - name: Upload Protected APK
         uses: actions/upload-artifact@v4

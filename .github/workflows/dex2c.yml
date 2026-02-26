@@ -1,0 +1,42 @@
+name: Dex2C APK Builder
+
+on:
+  workflow_dispatch: # دا اپشن تاسو ته اجازه درکوي چې پروسه په خپل لاس پیل کړئ
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Clone Dex2C Tool (dcc)
+        run: git clone https://github.com/amimo/dcc.git
+
+      - name: Install Apktool and Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apktool
+
+      - name: Run Dex2C on APK
+        run: |
+          # دلته د خپل اپلیکیشن نوم بدل کړئ که mohasaba.apk نه وي
+          python dcc/dcc.py -a mohasaba.apk -o protected_app.apk
+
+      - name: Upload Protected APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: Protected-APK-File
+          path: protected_app.apk

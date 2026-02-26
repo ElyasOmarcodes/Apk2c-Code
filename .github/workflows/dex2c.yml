@@ -34,14 +34,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y apktool
 
-      - name: Install Python Dependencies # دا نوی قدم دی چې ستونزه حلوي
+      - name: Install Python Dependencies # ما دلته نوي اړین ماډیولونه ور زیات کړل
         run: |
           python -m pip install --upgrade pip
-          pip install asn1crypto lxml colorama
+          pip install asn1crypto lxml colorama networkx pydot pycryptodome
 
       - name: Run Dex2C on APK
         run: |
-          # دلته خپل د اپلیکیشن نوم تایید کړئ
+          # دلته د خپل اپلیکیشن نوم (لکه mohasaba.apk) سم ولیکئ
           python dcc/dcc.py -a mohasaba.apk -o protected_app.apk
 
       - name: Upload Protected APK

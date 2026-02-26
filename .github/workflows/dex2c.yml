@@ -1,4 +1,4 @@
-name: Ultimate APK Protector (Obfuscapk)
+name: Ultimate APK Protector (Docker)
 
 on:
   push:
@@ -15,36 +15,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
-
-      - name: Install System Dependencies
+      - name: Pull Obfuscapk Docker Image
         run: |
-          sudo apt-get update
-          sudo apt-get install -y apktool zipalign
-
-      - name: Download Obfuscapk
-        run: git clone https://github.com/ClaudiuGeorgiu/Obfuscapk.git
-
-      - name: Install Python Dependencies
-        run: |
-          cd Obfuscapk/src
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          # د ډاکر بشپړ او تیار شوی ماشین ډاونلوډ کوو
+          docker pull claudiugeorgiu/obfuscapk
 
       - name: Run Strong Obfuscation
         run: |
-          # اپلیکیشن د پروګرام فولډر ته کاپي کوو
-          cp KeyStore.apk Obfuscapk/src/
-          cd Obfuscapk/src
-          
-          # دلته پرې تر ټولو قوي قلفونه (متن پټول، نومونه بدلول او کوډ ګډوډول) لګوو
-          python -m obfuscapk.cli -o StringEncryption -o ClassRename -o MethodRename -o FieldRename -o CallIndirection -o ControlFlowObfuscation KeyStore.apk
-          
-          # نوی فایل بېرته راوړو
-          cp KeyStore_obfuscated.apk ../../
+          # دلته خپل اپلیکیشن (KeyStore.apk) ډاکر ماشین ته ورکوو ترڅو په یوه کلیک یې قلف کړي
+          docker run --rm -v "${PWD}:/workdir" claudiugeorgiu/obfuscapk -o StringEncryption -o ClassRename -o MethodRename -o FieldRename -o CallIndirection -o ControlFlowObfuscation KeyStore.apk
 
       - name: Upload Protected APK
         uses: actions/upload-artifact@v4

@@ -41,17 +41,13 @@ jobs:
 
       - name: Run Dex2C on APK
         run: |
-          # د انډرایډ NDK لاره
           export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
-          
-          # ستاسو د محاسبه اپلیکیشن د پروګرام فولډر ته کاپي کوو
           cp mohasaba.apk dcc/
           cd dcc
           
-          # دلته مو فلټر کټ مټ ستاسو د اپلیکیشن په اصلي پېکج نوم عیار کړ
-          python dcc.py mohasaba.apk -o protected_app.apk --filter "Lcom/elyasomar/muhasiba/.*"
+          # فلټر مو بیخي ساده کړ ترڅو که په هر فارمټ وي، ویې نیسي
+          python dcc.py mohasaba.apk -o protected_app.apk --filter ".*elyasomar.*"
           
-          # نوی قلف شوی اپلیکیشن بېرته راوړو
           cp protected_app.apk ../
 
       - name: Upload Protected APK

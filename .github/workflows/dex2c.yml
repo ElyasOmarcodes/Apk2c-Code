@@ -44,14 +44,14 @@ jobs:
           # د انډرایډ NDK لاره
           export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
           
-          # فایل د پروګرا.م فولډر ته کاپي کوو
+          # ستاسو د محاسبه اپلیکیشن د پروګرام فولډر ته کاپي کوو
           cp mohasaba.apk dcc/
           cd dcc
           
-          # دلته مو کټ مټ ستاسو د ټسټ کلاس (TextObject) ورته په نښه کړی دی
-          python dcc.py mohasaba.apk -o protected_app.apk --filter "Lcom/imaginstudio/imagetools/pixellab/TextObject.*"
+          # دلته مو فلټر کټ مټ ستاسو د اپلیکیشن په اصلي پېکج نوم عیار کړ
+          python dcc.py mohasaba.apk -o protected_app.apk --filter "Lcom/elyasomar/muhasiba/.*"
           
-          # نوی اپلیکیشن بېرته راوړو
+          # نوی قلف شوی اپلیکیشن بېرته راوړو
           cp protected_app.apk ../
 
       - name: Upload Protected APK

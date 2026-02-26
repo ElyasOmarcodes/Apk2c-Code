@@ -41,18 +41,17 @@ jobs:
 
       - name: Run Dex2C on APK
         run: |
-          # 1. د انډرایډ NDK لاره ورته ښیو
+          # د انډرایډ NDK لاره
           export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
           
-          # 2. اپلیکیشن د پروګرام فولډر ته کاپي کوو او ور ننوځو
+          # فایل د پروګرام فولډر ته کاپي کوو
           cp mohasaba.apk dcc/
           cd dcc
           
-          # 3. اصلي عملیه د فلټر سره (پام وکړئ)
-          # مهمه یادونه: که د "محاسبه" اپلیکیشن د پېکج نوم بل څه وي، دلته یې بدل کړئ
-          python dcc.py mohasaba.apk -o protected_app.apk --filter "Lcom/my/newproject60/.*"
+          # اصلي عملیه ستاسو د پکسلاب له دقیق پېکج نوم سره
+          python dcc.py mohasaba.apk -o protected_app.apk --filter "Lcom/imaginstudio/imagetools/pixellab/.*"
           
-          # 4. نوی اپلیکیشن بېرته اصلي ځای ته راوړو
+          # نوی اپلیکیشن بېرته راوړو
           cp protected_app.apk ../
 
       - name: Upload Protected APK

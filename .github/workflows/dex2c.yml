@@ -17,13 +17,12 @@ jobs:
 
       - name: Pull Obfuscapk Docker Image
         run: |
-          # د ډاکر بشپړ او تیار شوی ماشین ډاونلوډ کوو
           docker pull claudiugeorgiu/obfuscapk
 
       - name: Run Strong Obfuscation
         run: |
-          # دلته خپل اپلیکیشن (KeyStore.apk) ډاکر ماشین ته ورکوو ترڅو په یوه کلیک یې قلف کړي
-          docker run --rm -v "${PWD}:/workdir" claudiugeorgiu/obfuscapk -o StringEncryption -o ClassRename -o MethodRename -o FieldRename -o CallIndirection -o ControlFlowObfuscation KeyStore.apk
+          # دلته مو د قلفونو نومونه د پروګرام له اصلي لیست سره سم کړل
+          docker run --rm -v "${PWD}:/workdir" claudiugeorgiu/obfuscapk -o ConstStringEncryption -o ClassRename -o MethodRename -o FieldRename -o CallIndirection -o Reorder -o Goto KeyStore.apk
 
       - name: Upload Protected APK
         uses: actions/upload-artifact@v4

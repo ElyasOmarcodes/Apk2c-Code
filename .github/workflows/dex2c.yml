@@ -44,12 +44,12 @@ jobs:
           # د انډرایډ NDK لاره
           export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
           
-          # فایل د پروګرام فولډر ته کاپي کوو
+          # فایل د پروګرا.م فولډر ته کاپي کوو
           cp mohasaba.apk dcc/
           cd dcc
           
-          # اصلي عملیه ستاسو د پکسلاب له دقیق پېکج نوم سره
-          python dcc.py mohasaba.apk -o protected_app.apk --filter "Lcom/imaginstudio/imagetools/pixellab/.*"
+          # دلته مو کټ مټ ستاسو د ټسټ کلاس (TextObject) ورته په نښه کړی دی
+          python dcc.py mohasaba.apk -o protected_app.apk --filter "Lcom/imaginstudio/imagetools/pixellab/TextObject.*"
           
           # نوی اپلیکیشن بېرته راوړو
           cp protected_app.apk ../

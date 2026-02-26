@@ -1,11 +1,11 @@
 name: Dex2C APK Builder
 
 on:
-  push: # دا کمانډ پروسه اتومات پیلوي کله چې تاسو نوی اپلیکیشن اپلوډ کړئ
+  push:
     branches:
       - main
       - master
-  workflow_dispatch: # دا اپشن مې هم پرېښود ترڅو د اړتیا په وخت کې یې په خپل لاس هم چالان کړای شئ
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,16 +13,16 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4 # دلته ورژن v4 ته اپډیټ شو
+        uses: actions/checkout@v4
 
       - name: Set up JDK 11
-        uses: actions/setup-java@v4 # دلته هم v4 ته اپډیټ شو
+        uses: actions/setup-java@v4
         with:
           java-version: '11'
           distribution: 'temurin'
 
       - name: Set up Python
-        uses: actions/setup-python@v5 # دا مو هم تر ټولو نوي ورژن (v5) ته پورته کړ
+        uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
@@ -34,13 +34,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y apktool
 
+      - name: Install Python Dependencies # دا نوی قدم دی چې ستونزه حلوي
+        run: |
+          python -m pip install --upgrade pip
+          pip install asn1crypto lxml colorama
+
       - name: Run Dex2C on APK
         run: |
-          # پام مو وي چې دلته د خپل اپلیکیشن نوم (لکه mohasaba.apk) سم ولیکئ
+          # دلته خپل د اپلیکیشن نوم تایید کړئ
           python dcc/dcc.py -a mohasaba.apk -o protected_app.apk
 
       - name: Upload Protected APK
-        uses: actions/upload-artifact@v4 # اصلي ستونزه دلته وه چې v4 ته حل شوه
+        uses: actions/upload-artifact@v4
         with:
           name: Protected-APK-File
           path: protected_app.apk

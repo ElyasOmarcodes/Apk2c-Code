@@ -1,4 +1,4 @@
-name: Ultimate Dex2C Builder
+name: Ultimate APK Protector (Obfuscapk)
 
 on:
   push:
@@ -15,83 +15,39 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v4
-        with:
-          java-version: '11'
-          distribution: 'temurin'
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
-      - name: Clone Dex2C Tool (dcc)
-        run: git clone https://github.com/amimo/dcc.git
-
-      - name: Install Apktool and Dependencies
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y apktool zip unzip
+          sudo apt-get install -y apktool zipalign
+
+      - name: Download Obfuscapk
+        run: git clone https://github.com/ClaudiuGeorgiu/Obfuscapk.git
 
       - name: Install Python Dependencies
         run: |
+          cd Obfuscapk/src
           python -m pip install --upgrade pip
-          pip install asn1crypto lxml colorama networkx pydot pycryptodome
+          pip install -r requirements.txt
 
-      - name: Fix Multidex Issue (Smart DEX Swapper)
+      - name: Run Strong Obfuscation
         run: |
-          cat << 'EOF' > fix_dex.py
-          import zipfile
-          import os
-          import shutil
-
-          apk_name = "KeyStore.apk"
-          target_class = b"Lcom/my/newproject51"
-
-          # اپلیکیشن خلاصول
-          with zipfile.ZipFile(apk_name, 'r') as z:
-              z.extractall("extracted")
-
-          # د ټولو dex فایلونو پلټل
-          dex_files = [f for f in os.listdir("extracted") if f.endswith(".dex")]
-          target_dex = None
-
-          for dex in dex_files:
-              with open(os.path.join("extracted", dex), "rb") as f:
-                  if target_class in f.read():
-                      target_dex = dex
-                      break
-
-          if target_dex:
-              print(f"SUCCESS: Found your code in {target_dex}!")
-              if target_dex != "classes.dex":
-                  print("Swapping with classes.dex so DCC can read it...")
-                  os.rename(os.path.join("extracted", "classes.dex"), os.path.join("extracted", "temp.dex"))
-                  os.rename(os.path.join("extracted", target_dex), os.path.join("extracted", "classes.dex"))
-                  os.rename(os.path.join("extracted", "temp.dex"), os.path.join("extracted", target_dex))
-          else:
-              print("WARNING: Could not find your code in any DEX file.")
-
-          # بېرته بسته کول
-          shutil.make_archive("KeyStore_fixed", 'zip', "extracted")
-          os.rename("KeyStore_fixed.zip", "KeyStore_fixed.apk")
-          EOF
-          python fix_dex.py
-
-      - name: Run Dex2C on APK
-        run: |
-          export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
-          cp KeyStore_fixed.apk dcc/
-          cd dcc
+          # اپلیکیشن د پروګرام فولډر ته کاپي کوو
+          cp KeyStore.apk Obfuscapk/src/
+          cd Obfuscapk/src
           
-          # اصلي عملیه
-          python dcc.py KeyStore_fixed.apk -o protected_app.apk --filter ".*newproject51.*"
+          # دلته پرې تر ټولو قوي قلفونه (متن پټول، نومونه بدلول او کوډ ګډوډول) لګوو
+          python -m obfuscapk.cli -o StringEncryption -o ClassRename -o MethodRename -o FieldRename -o CallIndirection -o ControlFlowObfuscation KeyStore.apk
           
-          cp protected_app.apk ../
+          # نوی فایل بېرته راوړو
+          cp KeyStore_obfuscated.apk ../../
 
       - name: Upload Protected APK
         uses: actions/upload-artifact@v4
         with:
-          name: Protected-APK-File
-          path: protected_app.apk
+          name: Strongly-Protected-APK
+          path: KeyStore_obfuscated.apk
